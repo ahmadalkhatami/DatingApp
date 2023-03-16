@@ -12,7 +12,7 @@ import { ToastrService } from 'ngx-toastr';
 })
 export class NavComponent implements OnInit {
   model: any = {};
-user: any;
+  user: any;
 
   constructor(
     public accountService: AccountService,
@@ -25,7 +25,7 @@ user: any;
   login() {
     this.accountService.login(this.model).subscribe({
       next: (_) => this.router.navigateByUrl('/members'), //redirect ke /members ketika login
-      error: (error) => this.toastr.error(error.error), //error alert dengan toastr
+      // error: (error) => this.toastr.error(error.error), //error alert dengan toastr
     });
   }
   logout() {
