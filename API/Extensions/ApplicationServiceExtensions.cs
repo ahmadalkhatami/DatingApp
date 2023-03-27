@@ -1,5 +1,3 @@
-using Api.Services;
-using APi.Data;
 using API.Data;
 using API.Helpers;
 using API.Interfaces;
@@ -8,10 +6,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace API.Extensions
 {
-    //metode extensi harus menggunakan kelas statis
     public static class ApplicationServiceExtensions
     {
-        public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration config)
+        public static IServiceCollection AddApplicationServices(this IServiceCollection services,
+            IConfiguration config)
         {
             services.AddDbContext<DataContext>(opt =>
             {
@@ -24,6 +22,7 @@ namespace API.Extensions
             services.Configure<CloudinarySettings>(config.GetSection("CloudinarySettings"));
             services.AddScoped<IPhotoService, PhotoService>();
             services.AddScoped<LogUserActivity>();
+            services.AddScoped<ILikesRepository, LikesRepository>();
 
             return services;
         }

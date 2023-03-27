@@ -20,25 +20,20 @@ namespace API.Controllers
             _mapper = mapper;
             _tokenService = tokenService;
             _context = context;
-
         }
 
-        //end point
-        [HttpPost("register")]//POST: api/account/register
+        [HttpPost("register")] // POST: api/account/register?username=dave&password=pwd
         public async Task<ActionResult<UserDto>> Register(RegisterDto registerDto)
         {
-
-            if (await UserExists(registerDto.Username)) return BadRequest("username is taken");
+            if (await UserExists(registerDto.Username)) return BadRequest("Username is taken");
 
             var user = _mapper.Map<AppUser>(registerDto);
-            //hasing password
-            using var hmac = new HMACSHA512();
 
+            using var hmac = new HMACSHA512();
 
             user.UserName = registerDto.Username.ToLower();
             user.PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(registerDto.Password));
             user.PasswordSalt = hmac.Key;
-
 
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
@@ -49,9 +44,9 @@ namespace API.Controllers
                 Token = _tokenService.CreateToken(user),
                 KnownAs = user.KnownAs,
                 Gender = user.Gender
-
             };
         }
+
         [HttpPost("login")]
         public async Task<ActionResult<UserDto>> Login(LoginDto loginDto)
         {
@@ -63,12 +58,13 @@ namespace API.Controllers
 
             using var hmac = new HMACSHA512(user.PasswordSalt);
 
-            var ComputeHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(loginDto.Password));
+            var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(loginDto.Password));
 
-            for (int i = 0; i < ComputeHash.Length; i++)
+            for (int i = 0; i < computedHash.Length; i++)
             {
-                if (ComputeHash[i] != user.PasswordHash[i]) return Unauthorized("invalid password");
+                if (computedHash[i] != user.PasswordHash[i]) return Unauthorized("invalid password");
             }
+
             return new UserDto
             {
                 Username = user.UserName,
@@ -78,6 +74,7 @@ namespace API.Controllers
                 Gender = user.Gender
             };
         }
+
         private async Task<bool> UserExists(string username)
         {
             return await _context.Users.AnyAsync(x => x.UserName == username.ToLower());

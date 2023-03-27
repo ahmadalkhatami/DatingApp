@@ -5,7 +5,7 @@ namespace API.Helpers
 {
     public class PagedList<T> : List<T>
     {
-        public PagedList(IEnumerable<T> items,int count, int pageNumber, int pageSize)
+        public PagedList(IEnumerable<T> items, int count, int pageNumber, int pageSize)
         {
             CurrentPage = pageNumber;
             TotalPages = (int) Math.Ceiling(count / (double) pageSize);
@@ -19,7 +19,8 @@ namespace API.Helpers
         public int PageSize { get; set; }
         public int TotalCount { get; set; }
 
-        public static async Task<PagedList<T>> CreateAsync(IQueryable<T> source, int pageNumber, int pageSize)
+        public static async Task<PagedList<T>> CreateAsync(IQueryable<T> source, 
+            int pageNumber, int pageSize)
         {
             var count = await source.CountAsync();
             var items = await source.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
